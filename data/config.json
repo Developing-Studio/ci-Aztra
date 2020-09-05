@@ -1,0 +1,22 @@
+{
+    "botName": "Aztra",
+    "betaprefix": "*",
+    "inspection": false,
+    "is_android": false,
+    "securedir": {
+        "Windows": "C:/aztra",
+        "Linux": "/workspace/aztra",
+        "Android": "/sdcard/aztra"
+    },
+    "tokenFileName": "token.txt",
+    "betatokenFileName": "beta.txt",
+    "maxlogbytes": 5242880,
+    "dbacName": "dbac.json",
+    "sshFileName": "ssh.json",
+    "dbIP": "192.168.0.7",
+    "localRun": false,
+    "betamode": true,
+    "ims_host": "arpa.kro.kr",
+    "max_charcount": 5,
+    "support_url": "https://discord.com/invite/7aFczQk"
+}

@@ -1,21 +1,26 @@
 import aiomysql
 import logging
 from discord.ext import commands
-from . import msglogger, checks, emojictrl, embedmgr
+from . import msglogger, checks, aztra, emojictrl, datamgr, embedmgr
 import sqlite3
 
 class BaseCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: aztra.Aztra):
         self.bot = bot
-        self.emj: emojictrl.Emoji = bot.datas.get('emojictrl')
-        self.msglog: msglogger.Msglog = bot.datas.get('msglog')
-        self.logger: logging.Logger = bot.datas.get('logger')
-        self.pool: aiomysql.Connection = bot.datas.get('pool')
-        self.errlogger = bot.datas.get('errlogger')
-        self.pinglogger = bot.datas.get('pinglogger')
+        self.config = bot.get_data('config')
+        self.color = bot.get_data('color')
+        self.emj: emojictrl.Emoji = bot.get_data('emojictrl')
+        self.msglog: msglogger.Msglog = bot.get_data('msglog')
+        self.logger: logging.Logger = bot.get_data('logger')
+        self.pool: aiomysql.Connection = bot.get_data('pool')
+        self.check: checks.Checks = bot.get_data('check')
+        self.errlogger = bot.get_data('errlogger')
+        self.pinglogger = bot.get_data('pinglogger')
+        self.datadb: datamgr.DataDB = bot.get_data('datadb')
+        self.awaiter = bot.get_data('awaiter')
         self.prefix = bot.command_prefix[0]
-        self.eventcogname = bot.datas.get('eventcogname')
-        self.embedmgr: embedmgr.EmbedMgr = bot.datas.get('embedmgr')
+        self.eventcogname = bot.get_data('eventcogname')
+        self.embedmgr: embedmgr.EmbedMgr = bot.get_data('embedmgr')
 
     def getlistener(self, name):
         listeners = self.bot.get_cog(self.eventcogname).get_listeners()

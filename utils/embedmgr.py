@@ -70,7 +70,7 @@ class EmbedMgr:
                         clss.append(attr)
         return clss
 
-    async def get(self, ctx: Union[commands.Context], name: str, *args, user: discord.User=None, cog: BaseCog=None, delafter: Optional[int]=None, xtoclose: bool=False, **kwargs) -> discord.Embed:
+    async def get(self, ctx: Union[commands.Context, discord.User], name: str, *args, user: discord.User=None, cog: BaseCog=None, delafter: Optional[int]=None, xtoclose: bool=False, **kwargs) -> discord.Embed:
         async with self.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 lang = self.default_lang
