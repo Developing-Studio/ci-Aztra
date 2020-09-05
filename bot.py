@@ -12,7 +12,7 @@ import paramiko
 from utils import errors, checks, msglogger, emojictrl, datamgr, embedmgr
 from utils.aztra import Aztra
 from db import permissions
-from templates import aztraembeds, eventembeds, basecembeds, publicembeds
+from templates import aztraembeds, eventembeds, basecembeds, publicembeds, manageembeds
 
 # Local Data Load
 with open('./data/config.json', 'r', encoding='utf-8') as config_file:
@@ -173,7 +173,8 @@ embedmgr = embedmgr.EmbedMgr(
     aztraembeds,
     eventembeds,
     basecembeds,
-    publicembeds
+    publicembeds,
+    manageembeds,
 )
 
 # 체크 매니저

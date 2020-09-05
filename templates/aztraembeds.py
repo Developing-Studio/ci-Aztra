@@ -239,14 +239,9 @@ class Register_already_registered(aEmbedBase):
     
 class  Register(aEmbedBase):
     async def ko(self):
-        embed = discord.Embed(title='Aztra 등록', description='**Aztra를 이용하기 위한 이용약관 및 개인정보 취급방침입니다. Aztra를 이용하려면 동의가 필요 합니다.**', color=self.cog.color['ask'])
+        embed = discord.Embed(title='Aztra 등록', description=f'{self.ctx.author.mention}, **Aztra를 이용하기 위한 이용약관 및 개인정보 취급방침입니다. Aztra를 이용하려면 동의가 필요 합니다.**', color=self.cog.color['ask'])
         embed.add_field(name='ㅤ', value='[이용약관](https://www.infiniteteam.me/tos)\n', inline=True)
         embed.add_field(name='ㅤ', value='[개인정보 취급방침](https://www.infiniteteam.me/privacy)\n', inline=True)
-        return embed
-    async def en(self):
-        embed = discord.Embed(title='Aztra sign up', description='**These are the terms of use and privacy policy for using Aztra. Consent is required to use Aztra.**', color=self.cog.color['ask'])
-        embed.add_field(name='ㅤ', value='[Terms of Use](https://www.infiniteteam.me/tos)\n', inline=True)
-        embed.add_field(name='ㅤ', value='[Privacy Policy](https://www.infiniteteam.me/privacy)\n', inline=True)
         return embed
     
 class Register_done(aEmbedBase):
@@ -262,7 +257,7 @@ class Register_done(aEmbedBase):
 class Withdraw(aEmbedBase):
     async def ko(self):
         embed = discord.Embed(title='Aztra 탈퇴',
-        description='''**Aztra 이용약관 및 개인정보 취급방침 동의를 철회하고, Aztra를 탈퇴하게 됩니다.**
+        description=f'''{self.ctx.author.mention}, **Aztra 이용약관 및 개인정보 취급방침 동의를 철회하고, Aztra를 탈퇴하게 됩니다.**
         이 경우 _사용자님의 모든 데이터(개인정보 취급방침을 참조하십시오)_가 Aztra에서 삭제되며, __되돌릴 수 없습니다.__
         계속할까요?''', color=self.cog.color['warn'])
         embed.add_field(name='ㅤ', value='[이용약관](https://www.infiniteteam.me/tos)\n', inline=True)

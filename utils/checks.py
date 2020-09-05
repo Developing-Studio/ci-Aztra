@@ -21,7 +21,8 @@ class Checks:
     async def _has_internal_perms(self, user: discord.User, **perms):
         async with self.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
-                await cur.execute('select * from userdata where id=%s', user.id)
+                if not await cur.execute('select * from userdata where id=%s', user.id):
+                    return []
                 fetch = await cur.fetchone()
                 value = fetch['perms']
                 pdgr = datamgr.PermDBMgr(self.datadb)

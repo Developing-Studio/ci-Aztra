@@ -142,7 +142,7 @@ class Azaleacmds(BaseCog):
     async def _withdraw(self, ctx: commands.Context):
         async with self.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
-                msg = await ctx.send(content=ctx.author.mention, embed=await self.embedmgr.get(ctx, 'Withdraw'))
+                msg = await ctx.send(embed=await self.embedmgr.get(ctx, 'Withdraw'))
                 emjs = ['⭕', '❌']
                 for em in emjs:
                     await msg.add_reaction(em)
