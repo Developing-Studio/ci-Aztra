@@ -13,6 +13,7 @@ from configs import advlogging
 class Events(BaseCog):
     def __init__(self, bot):
         super().__init__(bot)
+        bot.before_invoke(self.check_bot_perms_before_invoke)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -164,6 +165,9 @@ class Events(BaseCog):
 
                     if ctx.channel.type != discord.ChannelType.private:
                         await ctx.send(ctx.author.mention, embed=await self.embedmgr.get(ctx, 'Cmderror_errdm_sent', msg))
+
+    async def check_bot_perms_before_invoke(self, ctx):
+        raise Exception
 
 def setup(bot):
     cog = Events(bot)

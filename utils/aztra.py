@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from . import basecog
 
 class Aztra(commands.Bot):
     def __init__(self, command_prefix, error, help_command=commands.bot._default, description=None, **options):
@@ -29,3 +30,12 @@ class Aztra(commands.Bot):
             del self.datas[name]
         except KeyError:
             raise KeyError(f"'{name}' 글로벌 데이터가 존재하지 않습니다.")
+
+    async def on_message(self, message: discord.Message):
+        try:
+            await self.process_commands(message)
+        except Exception as exc:
+            ctx = await self.get_context(message)
+            cog = self.get_cog(self.datas.get('eventcogname'))
+            lsnr = cog.getlistener('on_command_error')
+            await lsnr(ctx, exc)
