@@ -24,7 +24,7 @@ class BaseCmds(BaseCog):
     async def _ext_reload(self, ctx: commands.Context, *names):
         reloads = self.bot.extensions
         if (not names) or ('*' in names):
-            for onename in reloads:
+            for onename in list(reloads):
                 self.bot.reload_extension(onename)
             await ctx.send(embed=await self.embedmgr.get(ctx, 'Ext_reload', reloads))
             self.msglog.log(ctx, '[모든 확장 리로드 완료]')

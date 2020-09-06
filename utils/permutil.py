@@ -4,7 +4,8 @@ def format_perm_by_name(name):
     names = {
         'administrator': '관리자',
         'add_reactions': '반응 추가하기',
-        'manage_messages': '메시지 관리하기'
+        'manage_messages': '메시지 관리하기',
+        'read_message_history': '메시지 기록 보기'
     }
     try:
         rst = names[name]

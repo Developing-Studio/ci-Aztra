@@ -14,20 +14,34 @@ class Managecmds(BaseCog):
             cmd.add_check(commands.guild_only())
 
     @commands.has_permissions(manage_messages=True)
+    @commands.bot_has_permissions(manage_messages=True, read_message_history=True)
     @commands.command(name='청소', aliases=['clear'])
     async def _clear(self, ctx: commands.Context, count: int):
-        msgs = await ctx.channel.purge(limit=count)
-        await ctx.send(
-            embed=await self.embedmgr.get(ctx, 'Manage_clear', msgs),
+        await ctx.message.delete()
+        after = datetime.datetime.utcnow() - datetime.timedelta(days=14)
+        last_msg = next(iter(await ctx.channel.history(after=after, limit=1, oldest_first=False).flatten()), None)
+        if not last_msg:
+            await ctx.send(embed=await self.embedmgr.get(ctx, 'Manage_too_old_to_clear', delafter=7), delete_after=7)
+            return
+
+        cleartask = asyncio.create_task(ctx.channel.purge(limit=count, after=after))
+        msg = await ctx.send(embed=await self.embedmgr.get(ctx, 'Manage_clearing'))
+        msgs = await cleartask
+        await msg.edit(
+            embed=await self.embedmgr.get(ctx, 'Manage_clear_done', msgs),
             delete_after=5
         )
+        self.msglog.log(ctx, '[청소]')
 
     @commands.command(name='유저', aliases=['user', 'userinfo', '유저정보', '멤버정보', '사용자정보', 'memberinfo', 'member'])
     async def _userinfo(self, ctx: commands.Context, member: typing.Optional[discord.Member]=None):
         if not member:
             member = ctx.author
         
-        await ctx.send(embed=await self.embedmgr.get(ctx, 'User_info', member))
+        await ctx.send(
+            embed=await self.embedmgr.get(ctx, 'User_info', member),
+            allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
+        )
 
 def setup(bot):
     cog = Managecmds(bot)

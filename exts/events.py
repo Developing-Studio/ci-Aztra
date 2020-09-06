@@ -13,7 +13,6 @@ from configs import advlogging
 class Events(BaseCog):
     def __init__(self, bot):
         super().__init__(bot)
-        bot.before_invoke(self.check_bot_perms_before_invoke)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -99,16 +98,20 @@ class Events(BaseCog):
                     await ctx.send(embed=await self.embedmgr.get(ctx, 'Cmderror_missing_aztra_perms', error.missing_perms))
                     self.msglog.log(ctx, '[Azalea 권한 부족]')
                     return
+
+                elif isinstance(error, commands.BotMissingPermissions):
+                    await ctx.send(embed=await self.embedmgr.get(ctx, 'Cmderror_missing_bot_perms', error.missing_perms))
+                    self.msglog.log(ctx, '[봇 권한 부족]')
+                    return
                     
                 elif isinstance(error.__cause__, discord.HTTPException):
                     if error.__cause__.code in [50013, 50001]:
                         try:
-                            await ctx.send(embed=await self.embedmgr.get(ctx, 'Cmderror_missing_bot_perms', originerrstr))
+                            await ctx.send(embed=await self.embedmgr.get(ctx, 'Cmderror_missing_bot_perms'))
                         except discord.Forbidden:
                             await ctx.author.send(embed=await self.embedmgr.get(ctx, 'Cmderror_missing_sendmsg_perm'))
                             self.msglog.log(ctx, '[봇 메시지 전송 권한 없음]')
                         else:
-                            self.msglog.print('')
                             self.msglog.log(ctx, '[봇 권한 부족]')
                         return
                         
@@ -165,9 +168,6 @@ class Events(BaseCog):
 
                     if ctx.channel.type != discord.ChannelType.private:
                         await ctx.send(ctx.author.mention, embed=await self.embedmgr.get(ctx, 'Cmderror_errdm_sent', msg))
-
-    async def check_bot_perms_before_invoke(self, ctx):
-        raise Exception
 
 def setup(bot):
     cog = Events(bot)

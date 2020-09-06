@@ -86,10 +86,9 @@ class Cmderror_missing_aztra_perms(aEmbedBase):
 
 
 class Cmderror_missing_bot_perms(aEmbedBase):
-    async def ko(self, errstr):
-        missings = permutil.find_missing_perms_by_tbstr(errstr)
-        fmtperms = [permutil.format_perm_by_name(perm) for perm in missings]
-        if missings:
+    async def ko(self, missing_perms=[]):
+        fmtperms = [permutil.format_perm_by_name(perm) for perm in missing_perms]
+        if missing_perms:
             embed = discord.Embed(
                 title="⛔ 봇 권한 부족!",
                 description="이 명령어를 사용하는 데 필요한 봇의 권한이 부족합니다!\n`"
