@@ -29,7 +29,7 @@ class Manage_clear_done(aEmbedBase):
 
 class User_info(aEmbedBase):
     async def ko(self, member: discord.Member):
-        embed = discord.Embed(title=f"📋｜{member} 님의 정보", color=self.cog.color["info"])
+        embed = discord.Embed(title=f"📋 | {member} 님의 정보", color=self.cog.color["info"])
         embed.add_field(name="서버 닉네임", value=member.display_name)
         embed.add_field(
             name="상태",
@@ -43,7 +43,7 @@ class User_info(aEmbedBase):
         activity = self.ctx.author.activities[0]
         embed.add_field(
             name="상태 메시지",
-            value=activity.name
+            value=discord.utils.escape_markdown(activity.name, as_needed=True)
             + " "
             + {
                 discord.ActivityType.playing: "하는 중",

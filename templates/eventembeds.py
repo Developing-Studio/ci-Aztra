@@ -199,3 +199,12 @@ class Cmderror_missing_sendmsg_perm(aEmbedBase):
             """,
             color=self.cog.color['error']
         )
+
+
+class Cmderror_bad_argument(aEmbedBase):
+    async def ko(self):
+        return discord.Embed(
+            title='❓ 명령어를 해석하는 중에 오류가 발생했습니다!',
+            description='입력한 명령어가 올바른지 확인해주세요!',
+            color=self.cog.color['error']
+        )

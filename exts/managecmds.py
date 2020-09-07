@@ -15,7 +15,7 @@ class Managecmds(BaseCog):
 
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True, read_message_history=True)
-    @commands.command(name='청소', aliases=['clear'])
+    @commands.command(name='clear', aliases=['청소', '클리어'])
     async def _clear(self, ctx: commands.Context, count: int):
         await ctx.message.delete()
         after = datetime.datetime.utcnow() - datetime.timedelta(days=14)
@@ -33,7 +33,7 @@ class Managecmds(BaseCog):
         )
         self.msglog.log(ctx, '[청소]')
 
-    @commands.command(name='유저', aliases=['user', 'userinfo', '유저정보', '멤버정보', '사용자정보', 'memberinfo', 'member'])
+    @commands.command(name='user', aliases=['유저', 'userinfo', '유저정보', '멤버정보', '사용자정보', 'memberinfo', 'member'])
     async def _userinfo(self, ctx: commands.Context, member: typing.Optional[discord.Member]=None):
         if not member:
             member = ctx.author

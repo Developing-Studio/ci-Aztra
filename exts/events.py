@@ -78,6 +78,11 @@ class Events(BaseCog):
                     
                 elif isinstance(error, errors.SentByBotUser):
                     return
+
+                elif isinstance(error, commands.BadArgument):
+                    await ctx.send(embed=await self.embedmgr.get(ctx, 'Cmderror_bad_argument'))
+                    self.msglog.log(ctx, '[올바르지 않은 명령 인자]')
+                    return
                     
                 elif isinstance(error, commands.NoPrivateMessage):
                     await ctx.send(embed=await self.embedmgr.get(ctx, 'Cmderror_no_private_message'))
