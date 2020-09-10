@@ -43,6 +43,10 @@ class Managecmds(BaseCog):
             allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
         )
 
+    @commands.command(name='server', aliases=['guild', '서버', '길드', '서버정보', '길드정보'])
+    async def _guildinfo(self, ctx: commands.Context):
+        await ctx.send(embed=await self.embedmgr.get(ctx, 'Guild_info'))
+
 def setup(bot):
     cog = Managecmds(bot)
     bot.add_cog(cog)
