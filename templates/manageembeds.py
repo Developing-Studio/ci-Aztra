@@ -34,13 +34,25 @@ class Manage_clear_done(aEmbedBase):
 
 class User_info(aEmbedBase):
     async def ko(self, member: discord.Member):
-        activity = self.ctx.author.activities[0]
+        activity = member.activities[0] if member.activities else None
+        sangme = (
+            discord.utils.escape_markdown(activity.name, as_needed=True)
+            + " "
+            + {
+                discord.ActivityType.playing: "하는 중",
+                discord.ActivityType.listening: "듣는 중",
+                discord.ActivityType.streaming: "방송 중",
+                discord.ActivityType.watching: "시청 중",
+            }.get(activity.type, "")
+            if activity
+            else "(없음)"
+        )
         return (
             discord.Embed(title=f"📋 | {member} 님의 정보", color=self.cog.color["info"])
-            .add_field(name="디스코드 ID", value=self.ctx.author.id)
-            .add_field(name="서버 닉네임", value=member.display_name)
+            .add_field(name="**디스코드 ID**", value=member.id)
+            .add_field(name="**서버 닉네임**", value=member.display_name)
             .add_field(
-                name="상태",
+                name="**상태**",
                 value={
                     discord.Status.online: "🟢 온라인",
                     discord.Status.idle: "🟡 자리 비움",
@@ -50,72 +62,65 @@ class User_info(aEmbedBase):
                 inline=False,
             )
             .add_field(
-                name="상태 메시지",
-                value=discord.utils.escape_markdown(activity.name, as_needed=True)
-                + " "
-                + {
-                    discord.ActivityType.playing: "하는 중",
-                    discord.ActivityType.listening: "듣는 중",
-                    discord.ActivityType.streaming: "방송 중",
-                    discord.ActivityType.watching: "시청 중",
-                }.get(activity.type, ""),
+                name="**상태 메시지**",
+                value=(sangme[:200] + "..." if len(sangme) > 200 else sangme),
                 inline=False,
             )
             .add_field(
-                name="최상위 역할",
-                value=self.ctx.author.top_role.mention
-                if self.ctx.author.top_role
-                else "없음",
+                name="**최상위 역할**",
+                value=member.top_role.mention if member.top_role else "없음",
                 inline=False,
             )
             .add_field(
-                name="디스코드 가입 일자",
+                name="**디스코드 가입 일자**",
                 value=member.created_at.replace(tzinfo=tz.tzutc())
                 .astimezone(tz.tzlocal())
                 .strftime("%Y년 %m월 %d일 %X"),
                 inline=False,
             )
             .add_field(
-                name="서버 참여 일자",
+                name="**서버 참여 일자**",
                 value=member.joined_at.replace(tzinfo=tz.tzutc())
                 .astimezone(tz.tzlocal())
                 .strftime("%Y년 %m월 %d일 %X"),
             )
-            .set_thumbnail(url=self.ctx.author.avatar_url)
+            .set_thumbnail(url=member.avatar_url)
         )
 
 
 class Guild_info(aEmbedBase):
     async def ko(self):
-        region = str(self.ctx.guild.region).replace("-", " ").title().replace('Us', 'US', 1)
+        region = (
+            str(self.ctx.guild.region).replace("-", " ").title().replace("Us", "US", 1)
+        )
         regioncode = {
-            'South Korea': 'kr',
-            'Brazil': 'br',
-            'Europe': 'eu',
-            'Hong Kong': 'hk',
-            'India': 'in',
-            'Japan': 'jp',
-            'Russia': 'ru',
-            'Singapore': 'sg',
-            'Southafrica': 'za',
-            'Sydney': 'au',
-            'US Central': 'us',
-            'US East': 'us',
-            'US West': 'us',
-            'US South': 'us'
+            "South Korea": "kr",
+            "Brazil": "br",
+            "Europe": "eu",
+            "Hong Kong": "hk",
+            "India": "in",
+            "Japan": "jp",
+            "Russia": "ru",
+            "Singapore": "sg",
+            "Southafrica": "za",
+            "Sydney": "au",
+            "US Central": "us",
+            "US East": "us",
+            "US West": "us",
+            "US South": "us",
         }.get(region)
         return (
             discord.Embed(title="🧾 | 서버 정보", color=self.cog.color["info"])
-            .add_field(name="서버 이름", value=self.ctx.guild.name)
+            .add_field(name="**서버 이름**", value=self.ctx.guild.name)
             .add_field(
-                name="서버 위치",
-                value=f':flag_{regioncode}: ' + region if regioncode else region
+                name="**서버 위치**",
+                value=f":flag_{regioncode}: " + region if regioncode else region,
             )
             .add_field(
-                name="이모지",
+                name="**이모지**",
                 value="""\
                     일반 `{}`개, 움직이는 이모지 `{}`개
-                    (최대 `{}`개)
+                    (최대 `{}`개씩)
                 """.format(
                     len(list(filter(lambda x: not x.animated, self.ctx.guild.emojis))),
                     len(list(filter(lambda x: x.animated, self.ctx.guild.emojis))),
@@ -124,10 +129,53 @@ class Guild_info(aEmbedBase):
                 inline=False,
             )
             .add_field(
-                name="잠수 채널",
+                name="**서버 부스트 레벨**",
+                value="부스트 없음"
+                if self.ctx.guild.premium_subscription_count == 0
+                else f"""\
+                    레벨 {self.ctx.guild.premium_tier}
+                    (부스트 {self.ctx.guild.premium_subscription_count}개)
+                """,
+            )
+            .add_field(
+                name="**잠수 채널**",
                 value=self.ctx.guild.afk_channel.mention
                 if self.ctx.guild.afk_channel
                 else "(없음)",
+            )
+            .add_field(
+                name="**2단계 인증 필요 여부**", value="예" if self.ctx.guild.mfa_level else "아니오"
+            )
+            .add_field(
+                name="**보안 수준**",
+                value={
+                    discord.VerificationLevel.none: "없음",
+                    discord.VerificationLevel.low: "낮음",
+                    discord.VerificationLevel.medium: "보통",
+                    discord.VerificationLevel.high: "높음",
+                    discord.VerificationLevel.very_high: "매우 높음",
+                }.get(self.ctx.guild.verification_level),
+            )
+            .add_field(
+                name="**콘텐츠 필터**",
+                value={
+                    discord.ContentFilter.disabled: "스캔하지 않음",
+                    discord.ContentFilter.no_role: "역할 없는 멤버만 스캔",
+                    discord.ContentFilter.all_members: "모든 멤버 스캔",
+                }.get(self.ctx.guild.explicit_content_filter),
+            )
+            .add_field(
+                name="**기본 알림 설정**",
+                value={
+                    discord.NotificationLevel.only_mentions: "@mentions만",
+                    discord.NotificationLevel.all_messages: "모든 메시지",
+                }.get(self.ctx.guild.default_notifications),
+            )
+            .add_field(
+                name='**서버 생성 일자**',
+                value=self.ctx.guild.created_at.replace(tzinfo=tz.tzutc())
+                .astimezone(tz.tzlocal())
+                .strftime("%Y년 %m월 %d일 %X")
             )
             .set_thumbnail(url=self.ctx.guild.icon_url)
         )

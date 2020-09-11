@@ -33,7 +33,7 @@ class Managecmds(BaseCog):
         )
         self.msglog.log(ctx, '[청소]')
 
-    @commands.command(name='user', aliases=['유저', 'userinfo', '유저정보', '멤버정보', '사용자정보', 'memberinfo', 'member'])
+    @commands.command(name='user', aliases=['유저', 'userinfo', '유저정보', '멤버정보', '사용자정보', 'memberinfo', 'member', '유정'])
     async def _userinfo(self, ctx: commands.Context, member: typing.Optional[discord.Member]=None):
         if not member:
             member = ctx.author
@@ -43,9 +43,13 @@ class Managecmds(BaseCog):
             allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
         )
 
-    @commands.command(name='server', aliases=['guild', '서버', '길드', '서버정보', '길드정보'])
+    @commands.command(name='server', aliases=['서버', '길드', '서버정보', '길드정보', '섭정', 'guild', 'serverinfo', 'guildinfo'])
     async def _guildinfo(self, ctx: commands.Context):
-        await ctx.send(embed=await self.embedmgr.get(ctx, 'Guild_info'))
+        await ctx.send(
+            embed=await self.embedmgr.get(ctx, 'Guild_info'),
+            allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
+        )
+        
 
 def setup(bot):
     cog = Managecmds(bot)
