@@ -108,6 +108,11 @@ class Events(BaseCog):
                     await ctx.send(embed=await self.embedmgr.get(ctx, 'Cmderror_missing_bot_perms', error.missing_perms))
                     self.msglog.log(ctx, '[봇 권한 부족]')
                     return
+
+                elif isinstance(error.__cause__, errors.SubcommandNotFound):
+                    await ctx.send(embed=await self.embedmgr.get(ctx, 'SubcommandNotFound'))
+                    self.msglog.log(ctx, '[존재하지 않는 서브커맨드]')
+                    return
                     
                 elif isinstance(error.__cause__, discord.HTTPException):
                     if error.__cause__.code in [50013, 50001]:

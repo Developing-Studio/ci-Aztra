@@ -5,7 +5,7 @@ import asyncio
 import typing
 import aiomysql
 from utils.basecog import BaseCog
-from utils import pager, emojibuttons
+from utils import pager, emojibuttons, errors
 
 class Managecmds(BaseCog):
     def __init__(self, bot):
@@ -33,7 +33,7 @@ class Managecmds(BaseCog):
         )
         self.msglog.log(ctx, '[청소]')
 
-    @commands.command(name='user', aliases=['유저', 'userinfo', '유저정보', '멤버정보', '사용자정보', 'memberinfo', 'member', '유정'])
+    @commands.command(name='userinfo', aliases=['유저정보', '멤버정보', '사용자정보', 'memberinfo'])
     async def _userinfo(self, ctx: commands.Context, member: typing.Optional[discord.Member]=None):
         if not member:
             member = ctx.author
@@ -43,10 +43,20 @@ class Managecmds(BaseCog):
             allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
         )
 
-    @commands.command(name='server', aliases=['서버', '길드', '서버정보', '길드정보', '섭정', 'guild', 'serverinfo', 'guildinfo'])
+    @commands.group(name='serverinfo', aliases=['서버정보', '길드정보', 'guildinfo'], invoke_without_command=False)
     async def _guildinfo(self, ctx: commands.Context):
+        if ctx.invoked_subcommand is not None or ctx.subcommand_passed is None:
+            await ctx.send(
+                embed=await self.embedmgr.get(ctx, 'Guild_info'),
+                allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
+            )
+        else:
+            raise errors.SubcommandNotFound
+
+    @_guildinfo.command(name='settings', aliases=['설정', 'setting'])
+    async def _guildinfo_(self, ctx: commands.Context):
         await ctx.send(
-            embed=await self.embedmgr.get(ctx, 'Guild_info'),
+            embed=await self.embedmgr.get(ctx, 'Guild_info_settings'),
             allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
         )
         

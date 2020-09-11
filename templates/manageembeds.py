@@ -116,6 +116,7 @@ class Guild_info(aEmbedBase):
                 name="**서버 위치**",
                 value=f":flag_{regioncode}: " + region if regioncode else region,
             )
+            .add_field(name="멤버 수", value=len(self.ctx.guild.members))
             .add_field(
                 name="**이모지**",
                 value="""\
@@ -144,7 +145,22 @@ class Guild_info(aEmbedBase):
                 else "(없음)",
             )
             .add_field(
-                name="**2단계 인증 필요 여부**", value="예" if self.ctx.guild.mfa_level else "아니오"
+                name="**서버 생성 일자**",
+                value=self.ctx.guild.created_at.replace(tzinfo=tz.tzutc())
+                .astimezone(tz.tzlocal())
+                .strftime("%Y년 %m월 %d일 %X"),
+            )
+            .set_thumbnail(url=self.ctx.guild.icon_url)
+        )
+
+
+class Guild_info_settings(aEmbedBase):
+    async def ko(self):
+        return (
+            discord.Embed(title="🧾 | 서버 정보 - 서버 설정 정보", color=self.cog.color["info"])
+            .add_field(
+                name="**2단계 인증 필요 여부**",
+                value="예" if self.ctx.guild.mfa_level else "아니오",
             )
             .add_field(
                 name="**보안 수준**",
@@ -171,11 +187,4 @@ class Guild_info(aEmbedBase):
                     discord.NotificationLevel.all_messages: "모든 메시지",
                 }.get(self.ctx.guild.default_notifications),
             )
-            .add_field(
-                name='**서버 생성 일자**',
-                value=self.ctx.guild.created_at.replace(tzinfo=tz.tzutc())
-                .astimezone(tz.tzlocal())
-                .strftime("%Y년 %m월 %d일 %X")
-            )
-            .set_thumbnail(url=self.ctx.guild.icon_url)
         )

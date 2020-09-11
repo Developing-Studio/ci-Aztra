@@ -29,26 +29,26 @@ class CharNotFound(aEmbedBase):
             title=f"❓ 존재하지 않는 캐릭터입니다!: `{charname}`", color=self.cog.color["error"]
         )
 
+
 class NotEnoughMoney(aEmbedBase):
     async def ko(self, more_required: int):
-        embed = discord.Embed(
+        return discord.Embed(
             title="❓ 돈이 부족합니다!",
             description=f"`{more_required}`골드가 부족합니다!",
             color=self.cog.color["error"],
         )
-        
-        return embed
 
 
-"""
-class Public:
-    @staticmethod
-    def invalid(cog: BaseCog, *, target: str, description: str = "", delafter: int = 7):
-        embed = discord.Embed(
-            title=f"❓ {target} (이)가 올바르지 않습니다!",
-            description=description,
-            color=cog.color["error"],
+class SubcommandNotFound(aEmbedBase):
+    async def ko(self):
+        return discord.Embed(
+            title="❓ 존재하지 않는 하위 명령어입니다!",
+            description="""\
+                사용할 수 있는 하위 명령어들:
+                {}{} [{}]
+            """.format(
+                self.cog.prefix,
+                self.ctx.command.name,
+                "/".join(map(lambda x: x.name, self.ctx.command.commands))
+            ),
         )
-        
-        return embed
-"""
