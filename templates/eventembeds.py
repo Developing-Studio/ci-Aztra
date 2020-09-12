@@ -208,3 +208,18 @@ class Cmderror_bad_argument(aEmbedBase):
             description='입력한 명령어가 올바른지 확인해주세요!',
             color=self.cog.color['error']
         )
+
+class Cmderror_subcommand_notfound(aEmbedBase):
+    async def ko(self):
+        return discord.Embed(
+            title="❓ 존재하지 않는 하위 명령어입니다!",
+            description="""\
+                사용할 수 있는 하위 명령어들:
+                ```{}{} [{}]```
+            """.format(
+                self.cog.prefix,
+                self.ctx.command.name,
+                "/".join(map(lambda x: x.name, self.ctx.command.commands))
+            ),
+            color=self.cog.color['error']
+        )

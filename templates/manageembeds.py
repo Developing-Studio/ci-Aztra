@@ -2,6 +2,7 @@ import discord
 from utils.embedmgr import aEmbedBase, aMsgBase
 import datetime
 from dateutil import tz
+from utils import permutil
 
 
 class Manage_clearing(aEmbedBase):
@@ -187,4 +188,26 @@ class Guild_info_settings(aEmbedBase):
                     discord.NotificationLevel.all_messages: "모든 메시지",
                 }.get(self.ctx.guild.default_notifications),
             )
+        )
+
+
+class Perm_check(aEmbedBase):
+    async def ko(self, member: discord.Member, channel: discord.TextChannel):
+        perms: discord.Permissions = member.permissions_in(channel)
+        allows = [permutil.format_perm_by_name(one[0]) for one in perms if one[1]]
+        denys = [permutil.format_perm_by_name(one[0]) for one in perms if not one[1]]
+        return (
+            discord.Embed(
+                title='🔐 | 멤버 권한 점검',
+                color=self.cog.color['info']
+            )
+            .add_field(
+                name='**허용된 권한 ({}개)**'.format(len(allows)),
+                value='`' + '`\n`'.join(allows) + '`' if allows else '(없음)'
+            )
+            .add_field(
+                name='**거부된 권한 ({}개)**'.format(len(denys)),
+                value='`' + '`\n`'.join(denys) + '`' if denys else '(없음)'
+            )
+            .set_footer(text='이 멤버는 관리자 권한이 있어 모든 권한을 이용할 수 있습니다' if perms.administrator else None)
         )

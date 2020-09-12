@@ -61,14 +61,13 @@ class Checks:
     def is_notbot(self):
         return commands.check(self.notbot)
 
-    async def subcmd_vaild(self, ctx: commands.Context):
-        cnames = list(map(lambda cmd: cmd.name, ctx.command.commands)) + [None]
-        if ctx.subcommand_passed in cnames:
+    async def subcmd_valid(self, ctx: commands.Context):
+        if ctx.invoked_subcommand is not None or ctx.subcommand_passed is None:
             return True
-        raise commands.CommandNotFound
+        raise errors.SubcommandNotFound
 
-    def if_subcmd_vaild(self):
-        return commands.check(self.subcmd_vaild)
+    def if_subcmd_valid(self):
+        return commands.check(self.subcmd_valid)
 
     async def on_inspection(self, ctx: commands.Context):
         if await self.is_master(ctx.author):

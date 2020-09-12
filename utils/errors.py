@@ -49,5 +49,5 @@ class MissingAztraPermissions(commands.CheckFailure):
 class onInspection(commands.CheckFailure):
     pass
 
-class SubcommandNotFound(AztraError):
+class SubcommandNotFound(commands.CheckFailure):
     pass

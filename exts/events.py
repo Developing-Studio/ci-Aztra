@@ -109,8 +109,8 @@ class Events(BaseCog):
                     self.msglog.log(ctx, '[봇 권한 부족]')
                     return
 
-                elif isinstance(error.__cause__, errors.SubcommandNotFound):
-                    await ctx.send(embed=await self.embedmgr.get(ctx, 'SubcommandNotFound'))
+                elif isinstance(error, errors.SubcommandNotFound):
+                    await ctx.send(embed=await self.embedmgr.get(ctx, 'Cmderror_subcommand_notfound'))
                     self.msglog.log(ctx, '[존재하지 않는 서브커맨드]')
                     return
                     

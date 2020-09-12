@@ -12,10 +12,12 @@ class Managecmds(BaseCog):
         super().__init__(bot)
         for cmd in self.get_commands():
             cmd.add_check(commands.guild_only())
+            if cmd.name == '서버정보':
+                cmd.add_check(self.check.subcmd_valid)
 
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True, read_message_history=True)
-    @commands.command(name='clear', aliases=['청소', '클리어'])
+    @commands.command(name='청소', aliases=['clear', '클리어'])
     async def _clear(self, ctx: commands.Context, count: int):
         await ctx.message.delete()
         after = datetime.datetime.utcnow() - datetime.timedelta(days=14)
@@ -33,7 +35,7 @@ class Managecmds(BaseCog):
         )
         self.msglog.log(ctx, '[청소]')
 
-    @commands.command(name='userinfo', aliases=['유저정보', '멤버정보', '사용자정보', 'memberinfo'])
+    @commands.command(name='유저정보', aliases=['userinfo', '멤버정보', '사용자정보', 'memberinfo'])
     async def _userinfo(self, ctx: commands.Context, member: typing.Optional[discord.Member]=None):
         if not member:
             member = ctx.author
@@ -43,21 +45,29 @@ class Managecmds(BaseCog):
             allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
         )
 
-    @commands.group(name='serverinfo', aliases=['서버정보', '길드정보', 'guildinfo'], invoke_without_command=False)
-    async def _guildinfo(self, ctx: commands.Context):
-        if ctx.invoked_subcommand is not None or ctx.subcommand_passed is None:
-            await ctx.send(
-                embed=await self.embedmgr.get(ctx, 'Guild_info'),
-                allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
-            )
-        else:
-            raise errors.SubcommandNotFound
+    @commands.group(name='서버정보', aliases=['serverinfo', '길드정보', 'guildinfo'], invoke_without_command=True)
+    async def _guildinfo(self, ctx: commands.Context, dd=None):
+        await ctx.send(
+            embed=await self.embedmgr.get(ctx, 'Guild_info'),
+            allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
+        )
 
-    @_guildinfo.command(name='settings', aliases=['설정', 'setting'])
-    async def _guildinfo_(self, ctx: commands.Context):
+    @_guildinfo.command(name='설정', aliases=['settings', 'setting'])
+    async def _guildinfo_settings(self, ctx: commands.Context):
         await ctx.send(
             embed=await self.embedmgr.get(ctx, 'Guild_info_settings'),
             allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
+        )
+
+    @commands.command(name='권한', aliases=['권한점검'])
+    async def _permissions_check(self, ctx: commands.Context, member: typing.Optional[discord.Member]=None, channel: typing.Optional[discord.TextChannel]=None):
+        if not member:
+            member = ctx.author
+        if not channel:
+            channel = ctx.channel
+
+        await ctx.send(
+            embed=await self.embedmgr.get(ctx, 'Perm_check', member, channel)
         )
         
 

@@ -37,18 +37,3 @@ class NotEnoughMoney(aEmbedBase):
             description=f"`{more_required}`골드가 부족합니다!",
             color=self.cog.color["error"],
         )
-
-
-class SubcommandNotFound(aEmbedBase):
-    async def ko(self):
-        return discord.Embed(
-            title="❓ 존재하지 않는 하위 명령어입니다!",
-            description="""\
-                사용할 수 있는 하위 명령어들:
-                {}{} [{}]
-            """.format(
-                self.cog.prefix,
-                self.ctx.command.name,
-                "/".join(map(lambda x: x.name, self.ctx.command.commands))
-            ),
-        )
