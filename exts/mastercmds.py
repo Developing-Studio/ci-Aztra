@@ -86,7 +86,7 @@ class Mastercmds(BaseCog):
                 except:
                     imgurl = None
                 notiembed = discord.Embed(title=title, description=desc, color=self.color['primary'], timestamp=datetime.datetime.utcnow())
-                notiembed.set_footer(text='작성자: ' + ctx.author.name, icon_url=ctx.author.avatar_url)
+                notiembed.set_footer(text=f'작성자: {ctx.author.name}\n[{self.prefix}공지채널] 명령으로 공지채널을 변경할 수 있습니다', icon_url=ctx.author.avatar_url)
                 if imgurl:
                     notiembed.set_image(url=imgurl)
                 preview = await ctx.send('다음과 같이 공지를 보냅니다. 계속할까요?', embed=notiembed)

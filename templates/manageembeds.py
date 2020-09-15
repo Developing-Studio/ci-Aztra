@@ -49,7 +49,7 @@ class User_info(aEmbedBase):
             else "(없음)"
         )
         return (
-            discord.Embed(title=f"📋 | {member} 님의 정보", color=self.cog.color["info"])
+            discord.Embed(title=f"📋 {member} 님의 정보", color=self.cog.color["info"])
             .add_field(name="**디스코드 ID**", value=member.id)
             .add_field(name="**서버 닉네임**", value=member.display_name)
             .add_field(
@@ -111,7 +111,7 @@ class Guild_info(aEmbedBase):
             "US South": "us",
         }.get(region)
         return (
-            discord.Embed(title="🧾 | 서버 정보", color=self.cog.color["info"])
+            discord.Embed(title="🧾 서버 정보", color=self.cog.color["info"])
             .add_field(name="**서버 이름**", value=self.ctx.guild.name)
             .add_field(
                 name="**서버 위치**",
@@ -158,7 +158,7 @@ class Guild_info(aEmbedBase):
 class Guild_info_settings(aEmbedBase):
     async def ko(self):
         return (
-            discord.Embed(title="🧾 | 서버 정보 - 서버 설정 정보", color=self.cog.color["info"])
+            discord.Embed(title="🧾 서버 정보 - 서버 설정 정보", color=self.cog.color["info"])
             .add_field(
                 name="**2단계 인증 필요 여부**",
                 value="예" if self.ctx.guild.mfa_level else "아니오",
@@ -192,22 +192,42 @@ class Guild_info_settings(aEmbedBase):
 
 
 class Perm_check(aEmbedBase):
-    async def ko(self, member: discord.Member, channel: discord.TextChannel):
-        perms: discord.Permissions = member.permissions_in(channel)
-        allows = [permutil.format_perm_by_name(one[0]) for one in perms if one[1]]
-        denys = [permutil.format_perm_by_name(one[0]) for one in perms if not one[1]]
+    async def ko(self, member: discord.Member, perms: discord.Permissions, channel):
+        allows = []
+        denys = []
+        for one in perms:
+            if channel == 'guild':
+                permname = permutil.format_perm_by_name(one[0], 'guild')
+            elif channel:
+                permname = permutil.format_perm_by_name(one[0], channel.type)
+            else:
+                permname = permutil.format_perm_by_name(one[0])
+
+            if one[1] and permname != one[0]:
+                allows.append(permname)
+            elif not (one[1]) and permname != one[0]:
+                denys.append(permname)
+
         return (
             discord.Embed(
-                title='🔐 | 멤버 권한 점검',
-                color=self.cog.color['info']
+                title="🔐 멤버 권한 점검",
+                description='{} 님의 {} 권한'.format(
+                    member.mention,
+                    '서버' if channel=='guild' else (f'{channel.mention} 채널' if channel else '전체')
+                ),
+                color=self.cog.color["info"]
             )
             .add_field(
-                name='**허용된 권한 ({}개)**'.format(len(allows)),
-                value='`' + '`\n`'.join(allows) + '`' if allows else '(없음)'
+                name="**허용된 권한 ({}개)**".format(len(allows)),
+                value="`" + "`\n`".join(allows) + "`" if allows else "(없음)",
             )
             .add_field(
-                name='**거부된 권한 ({}개)**'.format(len(denys)),
-                value='`' + '`\n`'.join(denys) + '`' if denys else '(없음)'
+                name="**거부된 권한 ({}개)**".format(len(denys)),
+                value="`" + "`\n`".join(denys) + "`" if denys else "(없음)",
             )
-            .set_footer(text='이 멤버는 관리자 권한이 있어 모든 권한을 이용할 수 있습니다' if perms.administrator else None)
+            .set_footer(
+                text="이 멤버는 관리자 권한이 있어 모든 권한을 이용할 수 있습니다"
+                if perms.administrator
+                else discord.Embed.Empty
+            )
         )

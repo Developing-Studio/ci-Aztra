@@ -2,18 +2,19 @@ import discord
 from discord.ext import commands
 import datetime
 import asyncio
-import typing
+from typing import Optional, Union
 import aiomysql
 from utils.basecog import BaseCog
 from utils import pager, emojibuttons, errors
+from functools import partial
 
 class Managecmds(BaseCog):
     def __init__(self, bot):
         super().__init__(bot)
         for cmd in self.get_commands():
             cmd.add_check(commands.guild_only())
-            if cmd.name == '서버정보':
-                cmd.add_check(self.check.subcmd_valid)
+            if cmd.name in ['서버정보', '권한']:
+                cmd.add_check(partial(self.check.subcmd_valid, True))
 
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True, read_message_history=True)
@@ -35,8 +36,8 @@ class Managecmds(BaseCog):
         )
         self.msglog.log(ctx, '[청소]')
 
-    @commands.command(name='유저정보', aliases=['userinfo', '멤버정보', '사용자정보', 'memberinfo'])
-    async def _userinfo(self, ctx: commands.Context, member: typing.Optional[discord.Member]=None):
+    @commands.command(name='유저정보', aliases=['userinfo', '멤버정보', '사용자정보', 'memberinfo', '유저', 'user'])
+    async def _userinfo(self, ctx: commands.Context, member: Optional[discord.Member]=None):
         if not member:
             member = ctx.author
         
@@ -45,8 +46,8 @@ class Managecmds(BaseCog):
             allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
         )
 
-    @commands.group(name='서버정보', aliases=['serverinfo', '길드정보', 'guildinfo'], invoke_without_command=True)
-    async def _guildinfo(self, ctx: commands.Context, dd=None):
+    @commands.group(name='서버정보', aliases=['serverinfo', '길드정보', 'guildinfo', '섭정', '서버', 'server', 'guild'], invoke_without_command=True)
+    async def _guildinfo(self, ctx: commands.Context):
         await ctx.send(
             embed=await self.embedmgr.get(ctx, 'Guild_info'),
             allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
@@ -59,15 +60,32 @@ class Managecmds(BaseCog):
             allowed_mentions=discord.AllowedMentions(roles=False, everyone=False)
         )
 
-    @commands.command(name='권한', aliases=['권한점검'])
-    async def _permissions_check(self, ctx: commands.Context, member: typing.Optional[discord.Member]=None, channel: typing.Optional[discord.TextChannel]=None):
+    @commands.group(name='권한', aliases=['권한점검'], invoke_without_command=True)
+    async def _permissions_check(self, ctx):
+        pass
+
+    @_permissions_check.command(name='채널')
+    async def _permissions_check_channel(self, ctx: commands.Context, member: Optional[discord.Member]=None, channel: Optional[Union[discord.TextChannel, discord.VoiceChannel]]=None):
         if not member:
             member = ctx.author
         if not channel:
             channel = ctx.channel
 
+        perms = member.permissions_in(channel)
+
         await ctx.send(
-            embed=await self.embedmgr.get(ctx, 'Perm_check', member, channel)
+            embed=await self.embedmgr.get(ctx, 'Perm_check', member, perms, channel)
+        )
+
+    @_permissions_check.command(name='서버')
+    async def _permissions_check_guild(self, ctx: commands.Context, member: Optional[discord.Member]=None):
+        if not member:
+            member = ctx.author
+
+        perms = member.guild_permissions
+
+        await ctx.send(
+            embed=await self.embedmgr.get(ctx, 'Perm_check', member, perms, 'guild')
         )
         
 

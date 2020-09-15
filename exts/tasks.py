@@ -56,6 +56,15 @@ class Tasks(BaseCog):
         try:
             async with self.pool.acquire() as conn:
                 async with conn.cursor(aiomysql.DictCursor) as cur:
+
+                    async def add_db(guild, notich):
+                        await cur.execute('insert into serverdata(id, noticechannel) values (%s, %s)', (guild.id, notich))
+                        await cur.execute('insert into greetings(guild, channel) values (%s, %s)', (guild.id, notich))
+
+                    async def rmv_db(gid):
+                        await cur.execute('delete from serverdata where id=%s', gid)
+                        await cur.execute('delete from greetings where guild=%s', gid)
+
                     await cur.execute('select id from serverdata')
                     db_guilds = await cur.fetchall()
                     db_guild_ids = list(map(lambda one: one['id'], db_guilds))
@@ -64,6 +73,7 @@ class Tasks(BaseCog):
                     # 등록 섹션
                     added_ids = list(set(client_guild_ids) - set(db_guild_ids))
                     added = list(map(lambda one: self.bot.get_guild(one), added_ids))
+
                     async def add_guild(guild: discord.Guild):
                         self.logger.info(f'새 서버를 발견했습니다: {guild.name}({guild.id})')
                         sendables = list(filter(lambda ch: ch.permissions_for(guild.me).send_messages, guild.text_channels))
@@ -94,11 +104,8 @@ class Tasks(BaseCog):
                             
                             if not selected:
                                 selected.append(sendables[0])
-                            await cur.execute('insert into serverdata(id, noticechannel, master) values (%s, %s, %s)', (guild.id, sendables[0].id, 0))
+                            await add_db(guild, sendables[0].id)
                             self.logger.info(f'서버 추가 성공: ' + guild.name + f'({guild.id})')
-                            embed = discord.Embed(title='🎉 안녕하세요!', description=f'안녕하세요! Aztra를 초대해 주셔서 감사합니다. `{self.prefix}도움` 명령으로 전체 명령어를 확인할 수 있어요!', color=self.color['primary'])
-                            embed.set_footer(text=f"혹시 이 채널이 공지 채널이 아닌가요? '{self.prefix}공지채널' 명령으로 선택하세요!\n")
-                            await sendables[0].send(embed=embed)
                             async def send_log(channel_id: int):
                                 channel = self.bot.get_channel(channel_id)
                                 await channel.send(embed=discord.Embed(title='{} 새 서버를 추가했습니다'.format(self.emj.get(None, 'check')), description='{g}({g.id})'.format(g=guild), color=self.color['info']))
@@ -107,7 +114,7 @@ class Tasks(BaseCog):
                                 aws.append(send_log(cid))
                             asyncio.gather(*aws)
                         else:
-                            await cur.execute('insert into serverdata(id, noticechannel, master) values (%s, %s, %s)', (guild.id, None, 0))
+                            await add_db(guild, None)
                             self.logger.info(f'접근 가능한 채널이 없는 서버 추가 성공: ' + guild.name + f'({guild.id})')
                             async def send_log(channel_id: int):
                                 channel = self.bot.get_channel(channel_id)
@@ -124,7 +131,7 @@ class Tasks(BaseCog):
                     deleted_ids = list(set(db_guild_ids) - set(client_guild_ids))
                     async def del_guild(gid: int):
                         self.logger.info(f'존재하지 않는 서버를 발견했습니다: {gid}')
-                        await cur.execute('delete from serverdata where id=%s', gid)
+                        await rmv_db(gid)
                         async def send_log(channel_id: int):
                             channel = self.bot.get_channel(channel_id)
                             await channel.send(embed=discord.Embed(title='{} 존재하지 않거나 나간 서버를 발견했습니다'.format(self.emj.get(None, 'cross')), description=f'DB에서 제거했습니다\nID: `{gid}`', color=self.color['info']))

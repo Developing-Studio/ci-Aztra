@@ -11,11 +11,11 @@ class Warn_list(aEmbedBase):
         warns = pgr.get_thispage()
         if not warns:
             return discord.Embed(
-                title=f"🚨 | {member} 님의 경고가 하나도 없습니다!", color=self.cog.color["warn"]
+                title=f"🚨 {member} 님의 경고가 하나도 없습니다!", color=self.cog.color["warn"]
             )
 
         embed = discord.Embed(
-            title=f"🚨 | {member} 님의 경고 목록", description="", color=self.cog.color["warn"]
+            title=f"🚨 {member} 님의 경고 목록", description="", color=self.cog.color["warn"]
         )
 
         for one in warns:
@@ -41,7 +41,7 @@ class Warn_give_ask(aEmbedBase):
     async def ko(self, target, reason, count):
         return (
             discord.Embed(
-                title="🚨 | 경고 부여",
+                title="🚨 경고 부여",
                 description="다음과 같이 경고를 부여하시겠습니까?",
                 color=self.cog.color["warn"],
             )

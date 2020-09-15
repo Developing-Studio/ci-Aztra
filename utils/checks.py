@@ -61,13 +61,12 @@ class Checks:
     def is_notbot(self):
         return commands.check(self.notbot)
 
-    async def subcmd_valid(self, ctx: commands.Context):
-        if ctx.invoked_subcommand is not None or ctx.subcommand_passed is None:
+    async def subcmd_valid(self, ctx: commands.Context, include_group_itself=False):
+        if include_group_itself:
+            pass
+        elif ctx.invoked_subcommand is not None or ctx.subcommand_passed is None:
             return True
         raise errors.SubcommandNotFound
-
-    def if_subcmd_valid(self):
-        return commands.check(self.subcmd_valid)
 
     async def on_inspection(self, ctx: commands.Context):
         if await self.is_master(ctx.author):
