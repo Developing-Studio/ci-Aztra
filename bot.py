@@ -12,7 +12,6 @@ import paramiko
 from utils import errors, checks, msglogger, emojictrl, datamgr, embedmgr
 from utils.aztra import Aztra
 from db import permissions
-from templates import aztraembeds, eventembeds, basecembeds, publicembeds, manageembeds, warnembeds, greetingembed
 
 # Local Data Load
 with open('./data/config.json', 'r', encoding='utf-8') as config_file:
@@ -166,17 +165,14 @@ def reloader(datadb: datamgr.DataDB):
 datadb = datamgr.DataDB()
 datadb.set_reloader(reloader)
 loader(datadb)
-
+os.listdir()
 # 임베드 매니저
 embedmgr = embedmgr.EmbedMgr(
     pool,
-    aztraembeds,
-    eventembeds,
-    basecembeds,
-    publicembeds,
-    manageembeds,
-    warnembeds,
-    greetingembed,
+    *[importlib.import_module(
+        'templates.' + os.path.splitext(ext)[0])
+        for ext in filter(lambda x: x.endswith('.py') and not x.startswith('_'), os.listdir('./templates'))
+    ]
 )
 
 # 체크 매니저
@@ -216,7 +212,7 @@ else:
     bot.add_data('on_inspection', False)
 
 bot.datas['allexts'] = []
-for ext in list(filter(lambda x: x.endswith('.py') and not x.startswith('_'), os.listdir('./exts'))):
+for ext in filter(lambda x: x.endswith('.py') and not x.startswith('_'), os.listdir('./exts')):
     bot.datas['allexts'].append('exts.' + os.path.splitext(ext)[0])
     bot.load_extension('exts.' + os.path.splitext(ext)[0])
 logger.info('{} 개의 확장을 로드했습니다'.format(len(bot.datas.get('allexts'))))

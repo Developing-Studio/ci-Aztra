@@ -37,3 +37,11 @@ class NotEnoughMoney(aEmbedBase):
             description=f"`{more_required}`골드가 부족합니다!",
             color=self.cog.color["error"],
         )
+
+
+class TextLengthLimitExceeded(aEmbedBase):
+    async def ko(self, length: int, limit: int):
+        return discord.Embed(
+            title="⛔ 글자 수 제한 초과!",
+            description=f"입력한 글자 수({length})가 너무 깁니다! (최대 {limit}자)"
+        )
