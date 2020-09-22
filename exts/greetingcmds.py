@@ -69,8 +69,9 @@ class Greetingcmds(BaseCog):
     async def _greeting_set(self, ctx: commands.Context):
         msg = await ctx.send(embed=await self.embedmgr.get(ctx, 'Greeting_setup', 'title'))
         title_message = await event_waiter.wait_for_message(self.bot, ctx=ctx, timeout=60)
-        if len(title_message) > 200:
-            
+        if len(title_message.content) > 200:
+            await ctx.send(embed=await self.embedmgr.get(ctx, 'TextLengthLimitExceeded', len(title_message.content), 200))
+            return
         async with self.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 if await cur.execute('select * from greetings where guild=%s', ctx.guild.id):
